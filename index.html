@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inera Doctor Hub - Clinical Decision Support</title>
+<meta name="description" content="Inera Doctor Hub: offline clinical decision support - symptom analysis, safe prescriptions, lab report reading, drug library, calculators. By INERA GROUP (Inera Software Pvt. Ltd.).">
+<meta name="theme-color" content="#0b5e57">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b5e57'/%3E%3Cpath d='M27 14h10v13h13v10H37v13H27V37H14V27h13z' fill='white'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar no-print">
+  <div class="brand">
+    <svg viewBox="0 0 64 64" class="logo" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0b5e57"/><path d="M27 14h10v13h13v10H37v13H27V37H14V27h13z" fill="#fff"/><path d="M6 44h12l4-7 6 14 5-10h25" stroke="#7ee0c8" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div><div class="brand-name">Inera Doctor Hub</div><div class="brand-sub">Clinical decision support · INERA GROUP</div></div>
+  </div>
+  <div class="top-right"><span class="pill" id="offlinePill">Runs on-device · No API · No limits</span><span class="doc-chip" id="docChip">Dr. -</span></div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar no-print" id="nav">
+    <button class="nav-btn active" data-tab="consult">🩺 Smart Consult</button>
+    <button class="nav-btn" data-tab="labs">🧪 Lab Report Reader</button>
+    <button class="nav-btn" data-tab="drugs">💊 Drug Library</button>
+    <button class="nav-btn" data-tab="interact">⚠️ Interaction Checker</button>
+    <button class="nav-btn" data-tab="calc">🧮 Clinical Calculators</button>
+    <button class="nav-btn" data-tab="records">📁 Patient Records</button>
+    <button class="nav-btn" data-tab="learn">🎓 Student Case Trainer</button>
+    <button class="nav-btn" data-tab="settings">⚙️ Doctor Profile</button>
+  </nav>
+
+  <main class="main">
+    <!-- CONSULT -->
+    <section class="tab active" id="tab-consult">
+      <div class="grid2">
+        <div class="card">
+          <h2>Patient</h2>
+          <div class="form-grid">
+            <label>Name<input id="pName" placeholder="Patient name"></label>
+            <label>Age (years)<input id="pAge" type="number" min="0" max="120" placeholder="e.g. 32"></label>
+            <label>Sex<select id="pSex"><option value="">-</option><option value="M">Male</option><option value="F">Female</option><option value="O">Other</option></select></label>
+            <label>Weight (kg)<input id="pWt" type="number" min="1" max="300" placeholder="kg"></label>
+            <label>Phone<input id="pPhone" placeholder="optional"></label>
+            <label>eGFR (if known)<input id="pEgfr" type="number" min="1" max="200" placeholder="mL/min/1.73m²"></label>
+          </div>
+          <h3>Conditions / status</h3>
+          <div class="checks" id="flagBox">
+            <label><input type="checkbox" value="pregnant">Pregnant</label>
+            <label><input type="checkbox" value="breastfeeding">Breastfeeding</label>
+            <label><input type="checkbox" value="diabetes">Diabetes</label>
+            <label><input type="checkbox" value="htn">Hypertension</label>
+            <label><input type="checkbox" value="ckd">Kidney disease (CKD)</label>
+            <label><input type="checkbox" value="liver">Liver disease</label>
+            <label><input type="checkbox" value="heart">Heart disease / QT risk</label>
+            <label><input type="checkbox" value="asthma">Asthma / COPD</label>
+            <label><input type="checkbox" value="pud">Peptic ulcer / GI bleed</label>
+            <label><input type="checkbox" value="anticoag">On blood thinner</label>
+          </div>
+          <h3>Drug allergies</h3>
+          <div class="checks" id="allergyBox">
+            <label><input type="checkbox" value="penicillin">Penicillin</label>
+            <label><input type="checkbox" value="cephalosporin">Cephalosporin</label>
+            <label><input type="checkbox" value="nsaid">NSAID / Aspirin</label>
+            <label><input type="checkbox" value="macrolide">Macrolide</label>
+            <label><input type="checkbox" value="quinolone">Quinolone</label>
+            <label><input type="checkbox" value="sulfa">Sulfa</label>
+          </div>
+          <label class="full">Current medicines (brand or generic, comma separated)<input id="pMeds" placeholder="e.g. Acitrom, Telma 40, Thyronorm"></label>
+        </div>
+
+        <div class="card">
+          <h2>Vitals</h2>
+          <div class="form-grid">
+            <label>Temp (°F)<input id="vTemp" type="number" step="0.1" placeholder="98.6"></label>
+            <label>BP systolic<input id="vSbp" type="number" placeholder="120"></label>
+            <label>BP diastolic<input id="vDbp" type="number" placeholder="80"></label>
+            <label>Pulse (/min)<input id="vPulse" type="number" placeholder="78"></label>
+            <label>SpO₂ (%)<input id="vSpo2" type="number" placeholder="98"></label>
+            <label>Resp. rate (/min)<input id="vRr" type="number" placeholder="16"></label>
+          </div>
+          <h2 class="mt">Complaint / diagnosis notes</h2>
+          <div class="mic-row">
+            <button class="btn mic" id="micBtn" type="button" title="Dictate">🎙️ <span id="micLbl">Dictate</span></button>
+            <span class="hint" id="micHint">Speak in English (Indian accent supported). Chrome / Edge recommended.</span>
+          </div>
+          <textarea id="complaint" rows="5" placeholder="Type or dictate: e.g. 'Fever since 4 days with body ache, pain behind the eyes and rash. No cough.'"></textarea>
+          <div class="chips" id="demoChips"></div>
+          <div class="row-btns">
+            <button class="btn primary" id="analyzeBtn">⚡ Analyse (Ctrl+Enter)</button>
+            <button class="btn ghost" id="resetBtn">New patient</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Reports, scans, photos &amp; videos</h2>
+        <p class="hint">Attach lab reports, prescriptions, X-ray/CT/MRI images or videos. Lab report photos can be read with on-device OCR. Imaging (X-ray / CT / MRI / USG) is attached to the record for the doctor or radiologist - this app does not interpret images, by design.</p>
+        <input type="file" id="fileIn" multiple accept="image/*,video/*,application/pdf">
+        <div class="thumbs" id="thumbs"></div>
+        <label class="full">Lab values / report text (paste, type, or fill via OCR)
+          <textarea id="labText" rows="4" placeholder="e.g. Hb 9.8 g/dL, MCV 71, Platelets 1.1 lakh, TSH 7.2, HbA1c 7.4%"></textarea></label>
+        <div id="labOut"></div>
+      </div>
+
+      <div id="results"></div>
+    </section>
+
+    <!-- LABS -->
+    <section class="tab" id="tab-labs">
+      <div class="card">
+        <h2>Lab Report Reader</h2>
+        <p class="hint">Paste or type any lab report. Values are matched to adult reference ranges, unit-normalised (e.g. "1.2 lakh" platelets) and interpreted. Ranges vary by laboratory - always cross-check with the printed reference range.</p>
+        <div class="form-grid"><label>Sex for ranges<select id="labSex"><option value="">Not specified</option><option value="M">Male</option><option value="F">Female</option></select></label></div>
+        <textarea id="labText2" rows="8" placeholder="Paste report text here"></textarea>
+        <div class="row-btns"><input type="file" id="labImg" accept="image/*"><button class="btn primary" id="labBtn2">Interpret</button><button class="btn ghost" id="labSample">Load sample report</button></div>
+        <div id="labOut2"></div>
+      </div>
+    </section>
+
+    <!-- DRUGS -->
+    <section class="tab" id="tab-drugs">
+      <div class="card">
+        <h2>Drug Library</h2>
+        <input id="drugSearch" placeholder="Search generic, brand or class (e.g. Dolo, NSAID, metformin)">
+        <div id="drugList" class="drug-list"></div>
+      </div>
+    </section>
+
+    <!-- INTERACTIONS -->
+    <section class="tab" id="tab-interact">
+      <div class="card">
+        <h2>Interaction Checker</h2>
+        <p class="hint">Add two or more medicines (generic or brand).</p>
+        <div class="row-btns"><input id="ixInput" list="drugNames" placeholder="Type a medicine and press Enter"><button class="btn" id="ixAdd">Add</button><button class="btn ghost" id="ixFromRx">Use current prescription</button><button class="btn ghost" id="ixClear">Clear</button></div>
+        <div class="chips" id="ixChips"></div>
+        <div id="ixOut"></div>
+      </div>
+    </section>
+
+    <!-- CALC -->
+    <section class="tab" id="tab-calc">
+      <div class="calc-grid" id="calcGrid"></div>
+    </section>
+
+    <!-- RECORDS -->
+    <section class="tab" id="tab-records">
+      <div class="card">
+        <h2>Patient Records <span class="hint">(stored only on this device)</span></h2>
+        <div class="row-btns"><input id="recSearch" placeholder="Search name, phone or diagnosis"><button class="btn ghost" id="recExport">Export backup (JSON)</button><label class="btn ghost file-btn">Import backup<input type="file" id="recImport" accept="application/json"></label></div>
+        <div id="recList"></div>
+      </div>
+    </section>
+
+    <!-- LEARN -->
+    <section class="tab" id="tab-learn">
+      <div class="card">
+        <h2>Student Case Trainer</h2>
+        <p class="hint">Random clinical vignette from the knowledge base. Pick the most likely diagnosis, then study the management and red flags.</p>
+        <div class="score" id="learnScore">Score: 0 / 0</div>
+        <div id="learnBox"></div>
+        <div class="row-btns"><button class="btn primary" id="learnNext">Next case</button></div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="tab" id="tab-settings">
+      <div class="card">
+        <h2>Doctor Profile (printed on prescriptions)</h2>
+        <div class="form-grid">
+          <label>Doctor name<input id="dName" placeholder="Dr. Full Name"></label>
+          <label>Qualifications<input id="dQual" placeholder="MBBS, MD (General Medicine)"></label>
+          <label>Medical Council Reg. No.<input id="dReg" placeholder="KMC / NMC Reg. No."></label>
+          <label>Clinic / Hospital<input id="dClinic" placeholder="Clinic name"></label>
+          <label>Address<input id="dAddr" placeholder="Address"></label>
+          <label>Phone<input id="dPhone" placeholder="Phone"></label>
+        </div>
+        <div class="row-btns"><button class="btn primary" id="saveDoc">Save profile</button><button class="btn danger" id="wipeAll">Delete all data on this device</button></div>
+        <div class="about">
+          <h3>About Inera Doctor Hub</h3>
+          <p>A rule-based clinical decision support system built by INERA GROUP (Inera Software Pvt. Ltd.) for teaching and clinical assistance. It runs entirely in the browser: no server, no API keys, no data leaves the device. Knowledge base: <span id="kbStats"></span>.</p>
+          <p><b>Scope and limits:</b> adult first-line management only. Paediatric doses are not auto-calculated. Imaging is not interpreted. Every prescription must be reviewed, edited if needed, and signed by a registered medical practitioner.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- REPORT OVERLAY -->
+<div class="overlay" id="overlay" aria-hidden="true">
+  <div class="overlay-bar no-print">
+    <button class="btn primary" id="printBtn">🖨️ Print / Save PDF</button>
+    <button class="btn" id="saveRecBtn">💾 Save to records</button>
+    <button class="btn" id="patientCopyBtn">📋 Copy patient instructions</button>
+    <button class="btn ghost" id="closeOverlay">Close</button>
+  </div>
+  <div class="report" id="report"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<datalist id="drugNames"></datalist>
+<footer class="foot no-print">Inera Doctor Hub · Clinical decision support for registered medical practitioners and medical education. Not a substitute for clinical examination and judgement. © INERA GROUP (Inera Software Pvt. Ltd.)</footer>
+
+<script src="drugs.js"></script>
+<script src="kb.js"></script>
+<script src="labs.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
